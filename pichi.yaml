@@ -1,0 +1,77 @@
+# SPDX-FileCopyrightText: Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+version: 1
+
+stages:
+  rootfs:
+    use: !bootstrap ghcr.io/pichi-vm/ubuntu:26.04
+    mounts:
+      /run: tmpfs
+      /tmp: tmpfs
+      /var/cache/apt: tmpfs
+      /var/lib/apt/lists: tmpfs
+    steps:
+      - exec:
+          command: |
+            case "$(dpkg --print-architecture)" in
+              amd64) mirror=http://archive.ubuntu.com/ubuntu ;;
+              arm64) mirror=http://ports.ubuntu.com/ubuntu-ports ;;
+            esac
+            # Conglobate prepares /mnt and owns the sandbox mounts.
+            mmdebstrap --mode=root --variant=minbase --skip=check/empty,chroot/mount \
+              --aptopt='Dir::Cache::pkgcache ""' --aptopt='Dir::Cache::srcpkgcache ""' \
+              --include=systemd-sysv,udev,linux-image-virtual,mmdebstrap,ca-certificates \
+              resolute /mnt \
+              "deb $mirror resolute main universe" \
+              "deb $mirror resolute-updates main universe" \
+              "deb $mirror resolute-security main universe"
+            echo ubuntu > /mnt/etc/hostname
+          network: true
+  firmware:
+    extend: rootfs
+    mounts:
+      /run: tmpfs
+      /tmp: tmpfs
+      /var/cache/apt: tmpfs
+      /var/lib/apt/lists: tmpfs
+    steps:
+      - copy: { path: pichi.sources, into: /etc/apt/sources.list.d/pichi.sources }
+      - exec:
+          command: |
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+              arma corium binutils
+          network: true
+      - exec:
+          command: |
+            kernel=/boot/vmlinuz
+            if [ "$(dpkg --print-architecture)" = arm64 ]; then
+              # Ubuntu wraps the ARM64 kernel in a unified EFI image.
+              objcopy -O binary --only-section=.linux "$kernel" /tmp/vmlinuz
+              kernel=/tmp/vmlinuz
+            fi
+            arma build --kernel "$kernel" \
+              --config /boot/config-* --initrd /usr/bin/corium \
+              --module virtio_pci --module virtio_blk --module virtio_console \
+              --module dm_mod --module dm_zero --module dm_snapshot \
+              --module dm_verity --module ext4 \
+              --cmdline "bootconfig loglevel=5" --dtb attached /boot.pmi
+
+image:
+  root: rootfs
+  boot:
+    extract: { from: firmware, path: /boot.pmi }
+    define:
+      corium.root: ""
+      kernel.ro: [ ]
+      kernel.console: hvc0
+      kernel.SYSTEMD_DEFAULT_MOUNT_RATE_LIMIT_BURST: "40"
+      kernel.systemd.volatile: state
+      kernel.systemd.unit: multi-user.target
+      kernel.systemd.show_status: "false"
+
+requirements:
+  slot: pci
+  cpus: { recommended: 2 }
+  memory: { required: 1024, recommended: 2048 }

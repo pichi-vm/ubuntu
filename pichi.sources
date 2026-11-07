@@ -1,0 +1,39 @@
+# SPDX-FileCopyrightText: Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+Types: deb
+URIs: https://ppa.launchpadcontent.net/nmccallum/pichi/ubuntu
+Suites: resolute
+Components: main
+Signed-By:
+ -----BEGIN PGP PUBLIC KEY BLOCK-----
+ Comment: Hostname:
+ Version: Hockeypuck 2.2
+ .
+ xsFNBGrifosBEADGeQ0YhwGV70RUQ3MdPMCG1ugJhmU5ldrqOdbCIArb8trggnJK
+ F2NLr2zJu+y5rU3C3QZMdw8DkNFHVEh9YfMYbV7HyxDWQa49oFnanEcC/iLwROTY
+ pa5jPSawnBqfBurTkEc3RqBXjS2irywwulh9vZVYzq8E7k4l9ox/E+LfNAQCrE98
+ AFyabg38O6D3tW5Z2zKvfabx5P3vAUb00FgJudmCsQ4IaQC2fwWvkV0xf6n+Mn7t
+ +uMqBDFXs1S21+ZVU+BzMvhVS1lXGLkoC9iut5WfWld7rb3mQh3lkuzilYEdDxM2
+ vkHjTd3duzrndpW8WPhDnzh9oTEHRfxNIMryLPY65NTILCCY4D2Oi/ZOxPr99FD6
+ d9rLAN4GWScbSQ4mJaY2Dicqza0Q5h3mqHM12syXgxR1ZE/ZKqdxvgVJHOq63C8F
+ WtArrH7FbC2NRI0qkYyl7JboZGdKMuiO+4ZB7jTFFE2ZHlR3IWPRwEqaYz+sczLO
+ Wbz9xgyFu3BW6l0HKz0qfa4EXiRu8qFVirTD0lu+Af0H2uzWjoS/DzFZukbb+ibZ
+ fizf4hbJlNb9tzFWXM9YeivvwygI25aif69eiDTG7dqzp2IPcpWfwqsJbU1Bqmxo
+ CXnCaNsFdVG/WwGx1vxWV/69yWErLe19UNfq4AnkahdZDDiK4/EoZy5M2wARAQAB
+ zSRMYXVuY2hwYWQgUFBBIGZvciBOYXRoYW5pZWwgTWNDYWxsdW3CwY4EEwEKADgW
+ IQQLe7uRfXIfg02tiqCWMOL8Ws3tQwUCauJ+iwIbAwULCQgHAgYVCgkICwIEFgID
+ AQIeAQIXgAAKCRCWMOL8Ws3tQ282EACxW2lxygMlVdDVqNN+jqW8nHMfa18GSb0a
+ Yx3KZvCK5PiYn75QMgbByjfvY/zl1eZjTm0MeWOAd4ifkjz8n3DL+EKIWQLcH7nh
+ iaAXKlIqBMXKelGsaaxM9/d3lMPCXdfAxUbP+H9hn0qM64Nb91b6MHbYPC5NJipA
+ 9GMDn2RefEiEKl8vFSpqk+OtUl25kybfP9E7gLJF4k6vM1NmpdeUzlEcMDenjv0U
+ vnJ93rNjUxKAPe6xhZXVLZRVACtnbJueMNfxuR/slvqwh969/7DcaKE3bYkdg38D
+ 4+RazNUQI4wBgh/hNuwSa7KJAThr5oe1qDivbd8e+0yQWLhgT3YXd1bxwjzcSCsN
+ CWP5gr/SqO7/yEUVyaAztKm8pXR0mPYmXIDHNH50yeA42TUsKhH/FQi5z+B/6N7s
+ 0aOWoKmPP7qju1L6TAtAeYzcLAJON0ee2bqQakwisrpKCHu2ucxwXCe9+Uyt69qU
+ 97Ait5CvsiBVzRB8Dnpl2astS1b4qTM8zwqZCCco8PNGyK20wsBnLdboFkRki3lA
+ y2B8tx/SrGsXn6zK9HFBuRCzHJYMGaaT6CmUY0rhrwf1RAcm2KKUaVgK07lcg8YG
+ 5DyGeCxei6S3GGt9XPEcJz7PU+i6D5dHg142Jl+GTd0QzzsSkhiK2jEDfVa4lVxG
+ +DhX2LzRJg==
+ =99P+
+ -----END PGP PUBLIC KEY BLOCK-----
