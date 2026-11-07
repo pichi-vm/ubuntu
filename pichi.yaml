@@ -20,7 +20,6 @@ stages:
             esac
             # Conglobate prepares /mnt and owns the sandbox mounts.
             mmdebstrap --mode=root --variant=minbase --skip=check/empty,chroot/mount \
-              --aptopt='Dir::Cache::pkgcache ""' --aptopt='Dir::Cache::srcpkgcache ""' \
               --include=systemd-sysv,udev,linux-image-virtual,mmdebstrap,ca-certificates \
               resolute /mnt \
               "deb $mirror resolute main universe" \
