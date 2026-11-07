@@ -41,17 +41,11 @@ stages:
           command: |
             apt-get update
             DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-              arma corium binutils
+              arma corium
           network: true
       - exec:
           command: |
-            kernel=/boot/vmlinuz
-            if [ "$(dpkg --print-architecture)" = arm64 ]; then
-              # Ubuntu wraps the ARM64 kernel in a unified EFI image.
-              objcopy -O binary --only-section=.linux "$kernel" /tmp/vmlinuz
-              kernel=/tmp/vmlinuz
-            fi
-            arma build --kernel "$kernel" \
+            arma build --kernel /boot/vmlinuz \
               --config /boot/config-* --initrd /usr/bin/corium \
               --module virtio_pci --module virtio_blk --module virtio_console \
               --module dm_mod --module dm_zero --module dm_snapshot \
