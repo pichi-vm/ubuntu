@@ -77,39 +77,23 @@ jobs:
           sudo add-apt-repository --yes ppa:nmccallum/pichi
           sudo apt-get install -y pichi
 
-      - name: 🔨 Build and save Ubuntu
+      - name: Boot published Ubuntu
         env:
           XDG_DATA_HOME: ${{ runner.temp }}/ubuntu-image-cache
         run: |
-          if ! pichi pull "ghcr.io/pichi-vm/ubuntu:$RELEASE"; then
-            sudo apt-get install -y mmdebstrap ubuntu-keyring e2fsprogs
-            bootstrap=$(mktemp -d "$RUNNER_TEMP/bootstrap.XXXXXX")
-            trap 'sudo rm -rf "$bootstrap"' EXIT
-            case "${{ matrix.arch }}" in
-              amd64) mirror=http://archive.ubuntu.com/ubuntu ;;
-              arm64) mirror=http://ports.ubuntu.com/ubuntu-ports ;;
-            esac
-            sudo mmdebstrap --mode=root --variant=minbase \
-              --include=mmdebstrap,ca-certificates resolute "$bootstrap/root" \
-              "deb $mirror resolute main universe" \
-              "deb $mirror resolute-updates main universe" \
-              "deb $mirror resolute-security main universe"
-            sudo mkfs.ext4 -F -E lazy_itable_init=0 \
-              -d "$bootstrap/root" "$bootstrap/bootstrap.raw" 1G
-            pichi import raw "$bootstrap/bootstrap.raw" --arch "${{ matrix.arch }}" \
-              -t "ghcr.io/pichi-vm/ubuntu:$RELEASE"
-          fi
-
-          pichi build . --ref HEAD --memory 8192 \
-            -t "ghcr.io/pichi-vm/ubuntu:$RELEASE"
-
-          pichi save "ghcr.io/pichi-vm/ubuntu:$RELEASE" -o "oci-${{ matrix.arch }}"
-
-      - name: ⬆️ Upload image
-        uses: actions/upload-artifact@v4
-        with:
-          name: oci-${{ matrix.arch }}
-          path: oci-${{ matrix.arch }}
+          test ! -e "$XDG_DATA_HOME"
+          image=ghcr.io/pichi-vm/ubuntu@sha256:ced7a0a286b993f85e771264157bc7f5523d56d9fda7bb304d317ca2a43e1237
+          pichi pull "$image"
+          pichi inspect "$image" | tee published-image.json |
+            jq -e '.manifest.annotations["dev.pichi.build.commit"] == "sha1:7bb33c01d679ddb95061a385dafcf864ae8c3719"'
+          cat published-image.json
+          status=0
+          timeout --signal=INT --kill-after=10s 60s \
+            pichi run "$image" > published-boot.log 2>&1 || status=$?
+          cat published-boot.log
+          pichi stop --time 0 "$(head -n 1 published-boot.log)"
+          test "$status" -eq 124
+          grep -q ' login:' published-boot.log
 
   publish:
     name: Publish
