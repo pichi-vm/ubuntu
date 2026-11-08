@@ -52,6 +52,9 @@ jobs:
 
   build:
     name: Build (${{ matrix.arch }})
+    permissions:
+      contents: read
+      packages: read
     strategy:
       fail-fast: false
       matrix:
@@ -78,11 +81,44 @@ jobs:
           sudo add-apt-repository --yes ppa:nmccallum/pichi
           sudo apt-get install -y pichi
 
+      - name: 📥 Prepare tool image
+        env:
+          GH_TOKEN: ${{ github.token }}
+          XDG_DATA_HOME: ${{ runner.temp }}/ubuntu-image-cache
+        run: |
+          image=ghcr.io/pichi-vm/ubuntu
+          digest=
+          if versions=$(gh api --paginate 'orgs/pichi-vm/packages/container/ubuntu/versions?per_page=100'); then
+            digest=$(jq -r --arg tag "$RELEASE" \
+              '.[] | select(.metadata.container.tags | index($tag)) | .name' <<< "$versions")
+          else
+            jq -se 'length == 1 and .[0].status == "404"' <<< "$versions" > /dev/null
+          fi
+          if [ -n "$digest" ]; then
+            pichi pull "$image@$digest"
+            pichi tag "$image@$digest" "$image:$RELEASE"
+          else
+            sudo apt-get install -y mmdebstrap ubuntu-keyring e2fsprogs
+            bootstrap=$(mktemp -d "$RUNNER_TEMP/bootstrap.XXXXXX")
+            trap 'sudo rm -rf "$bootstrap"' EXIT
+            case "${{ matrix.arch }}" in
+              amd64) mirror=http://archive.ubuntu.com/ubuntu ;;
+              arm64) mirror=http://ports.ubuntu.com/ubuntu-ports ;;
+            esac
+            sudo mmdebstrap --mode=root --variant=minbase \
+              --include=mmdebstrap,ca-certificates resolute "$bootstrap/root" \
+              "deb $mirror resolute main universe" \
+              "deb $mirror resolute-updates main universe" \
+              "deb $mirror resolute-security main universe"
+            sudo mkfs.ext4 -F -E lazy_itable_init=0 \
+              -d "$bootstrap/root" "$bootstrap/bootstrap.raw" 1G
+            pichi import raw "$bootstrap/bootstrap.raw" --arch "${{ matrix.arch }}" -t "$image:$RELEASE"
+          fi
+
       - name: 🔨 Build and save Ubuntu
         env:
           XDG_DATA_HOME: ${{ runner.temp }}/ubuntu-image-cache
         run: |
-          pichi pull "ghcr.io/pichi-vm/ubuntu:$RELEASE"
           pichi build . --ref HEAD --build-image "$BUILD_IMAGE" --memory 8192 \
             -t "ghcr.io/pichi-vm/ubuntu:$RELEASE"
 
