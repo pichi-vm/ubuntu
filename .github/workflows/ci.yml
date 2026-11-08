@@ -24,7 +24,7 @@ permissions:
 
 env:
   RELEASE: "26.04"
-  BUILD_IMAGE: "ghcr.io/pichi-vm/conglobate@sha256:71c582bf53caa46e4f44f905e5f087f21f0be6536b5a46a4e43a0f42b21df9ab"
+  BUILD_IMAGE: "ghcr.io/pichi-vm/conglobate@sha256:4a80386aee6536463e234643086ed0c5768affc8947d5037e05f8351c639c0b5"
 
 jobs:
   commit-messages:

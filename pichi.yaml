@@ -7,8 +7,8 @@ stages:
   rootfs:
     use: !bootstrap ghcr.io/pichi-vm/ubuntu:26.04
     mounts:
-      /run: tmpfs
-      /tmp: tmpfs
+      # Preserve dpkg state while package caches remain temporary.
+      /var: none
       /var/cache/apt: tmpfs
       /var/lib/apt/lists: tmpfs
     steps:
@@ -30,8 +30,8 @@ stages:
   firmware:
     extend: rootfs
     mounts:
-      /run: tmpfs
-      /tmp: tmpfs
+      # Preserve dpkg state while package caches remain temporary.
+      /var: none
       /var/cache/apt: tmpfs
       /var/lib/apt/lists: tmpfs
     steps:
