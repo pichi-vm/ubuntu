@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+lib/dpkg
+lib/apt/extended_states
+cache/debconf
+lib/pam
+lib/python
+lib/systemd/deb-systemd-helper-enabled
+lib/shells.state
