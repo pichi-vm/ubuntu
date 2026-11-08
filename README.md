@@ -21,6 +21,17 @@ The build uses conglobate’s default temporary `/run` and `/tmp` mounts.
 It explicitly disables the default `/var` mount to preserve dpkg’s installed
 package database, while APT caches and package lists remain temporary.
 
+## CI and bootstrap
+
+[CI](.github/workflows/ci.yml) builds once on each native architecture. It pulls
+the published Ubuntu image. If the pull fails, it imports a minimal Ubuntu root
+with mmdebstrap into Pichi's local cache under the same name, then runs the
+production recipe. The temporary tool image is never published.
+
+The recipe's `!bootstrap` input needs no lock file; its output manifest records
+`dev.pichi.build.bootstrapped=true`. Only successful main builds publish the
+combined image; pull requests do not publish.
+
 ## Help
 
 Report problems in [Issues](https://github.com/pichi-vm/ubuntu/issues).
