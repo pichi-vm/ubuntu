@@ -32,6 +32,15 @@ The recipe's `!bootstrap` input needs no lock file; its output manifest records
 `dev.pichi.build.bootstrapped=true`. Only successful main builds publish the
 combined image; pull requests do not publish.
 
+## Instance identity
+
+The base image ships an empty `/etc/machine-id` and no D-Bus machine ID.
+Systemd generates an ID on first boot, and tmpfiles copies it to
+`/var/lib/dbus/machine-id` in persistent state. Later boots with the same
+retained backing disk, selected with `pichi run --storage-file`, reuse that
+ID. Each fresh state volume gets its own identity; copying a state volume
+also copies its ID.
+
 ## Help
 
 Report problems in [Issues](https://github.com/pichi-vm/ubuntu/issues).
