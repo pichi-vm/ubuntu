@@ -1,0 +1,12 @@
+[Unit]
+Description=Ubuntu port qualification
+Requires=systemd-tmpfiles-setup.service
+After=systemd-tmpfiles-setup.service
+SuccessAction=poweroff
+FailureAction=poweroff
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /etc/systemd/system/port-check.sh
+StandardOutput=tty
+StandardError=tty
+TTYPath=/dev/hvc0

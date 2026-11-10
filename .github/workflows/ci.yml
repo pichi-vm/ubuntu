@@ -1,11 +1,6 @@
 name: CI
 
 on:
-  # Pull request branches are checked through pull_request, so each update
-  # gets one run.
-  push:
-    branches: [main]
-  pull_request:
   workflow_dispatch:
 
 # A newer push to the same pull request or branch cancels the older run.
@@ -105,52 +100,20 @@ jobs:
 
           pichi save "ghcr.io/pichi-vm/ubuntu:$RELEASE" -o "oci-${{ matrix.arch }}"
 
+      - name: Qualify native boot and retained identity
+        env:
+          XDG_DATA_HOME: ${{ runner.temp }}/ubuntu-image-cache
+        run: bash .qualification/run.sh
+
+      - name: Upload qualification evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qualification-${{ matrix.arch }}
+          path: qualification-evidence
+
       - name: ⬆️ Upload image
         uses: actions/upload-artifact@v4
         with:
           name: oci-${{ matrix.arch }}
           path: oci-${{ matrix.arch }}
-
-  publish:
-    name: Publish
-    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: [commit-messages, build]
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      packages: write
-    steps:
-      - name: 📦 Install Pichi
-        run: |
-          sudo add-apt-repository --yes ppa:nmccallum/pichi
-          sudo apt-get install -y pichi
-
-      - name: ⬇️ Download images
-        uses: actions/download-artifact@v4
-        with:
-          pattern: oci-*
-
-      - name: 🔑 Authenticate to GHCR
-        env:
-          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p "$HOME/.docker"
-          printf '{"auths":{"ghcr.io":{"auth":"%s"}}}' \
-            "$(printf '%s:%s' "$GITHUB_ACTOR" "$GHCR_TOKEN" | base64 -w0)" \
-            > "$HOME/.docker/config.json"
-
-      - name: 🚀 Publish image
-        run: |
-          pichi load "oci-amd64" --tag "ubuntu:${RELEASE}-amd64"
-          pichi load "oci-arm64" --tag "ubuntu:${RELEASE}-arm64"
-          list="ubuntu:${RELEASE}"
-          pichi manifest create "$list" "${list}-amd64" "${list}-arm64" \
-            -a "org.opencontainers.image.source=https://github.com/$GITHUB_REPOSITORY" \
-            -a "org.opencontainers.image.revision=$GITHUB_SHA" \
-            -a "org.opencontainers.image.version=${RELEASE}" \
-            -a "org.opencontainers.image.title=Ubuntu ${RELEASE}" \
-            -a "org.opencontainers.image.description=Ubuntu ${RELEASE} base OS carapace for pichi"
-          # Pichi requires explicit VM platform annotations on both entries.
-          pichi manifest annotate "$list" "${list}-amd64" --os pichi --arch amd64
-          pichi manifest annotate "$list" "${list}-arm64" --os pichi --arch arm64
-          pichi manifest push "$list" "ghcr.io/pichi-vm/ubuntu:$RELEASE"

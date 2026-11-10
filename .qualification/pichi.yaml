@@ -1,0 +1,18 @@
+version: 1
+stages:
+  workload:
+    extend: ghcr.io/pichi-vm/ubuntu:26.04
+    steps:
+      - copy: { path: files, into: /etc/systemd/system }
+image:
+  root: workload
+  boot:
+    inherit: workload
+    extend:
+      corium.log: info
+      kernel.systemd.unit: port-check.service
+      kernel.systemd.hostname: ubuntu-port-check
+requirements:
+  cpus: { recommended: 2 }
+  memory: { recommended: 2048 }
+  storage: { recommended: 1024 }
