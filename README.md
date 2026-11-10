@@ -21,6 +21,18 @@ The build uses conglobate’s default temporary `/run` and `/tmp` mounts.
 It explicitly disables the default `/var` mount to preserve dpkg’s installed
 package database, while APT caches and package lists remain temporary.
 
+## Hostname configuration
+
+For a derived image with read-only `/etc`, set the hostname under
+`image.boot.extend`:
+
+```yaml
+kernel.systemd.hostname: worker-01
+```
+
+Every instance of that image receives this name. This sets the guest hostname;
+it does not configure DNS.
+
 ## CI and bootstrap
 
 [CI](.github/workflows/ci.yml) builds once on each native architecture. It pulls
