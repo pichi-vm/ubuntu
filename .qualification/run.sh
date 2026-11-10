@@ -12,6 +12,7 @@ for run in first second fresh; do
   disk="$RUNNER_TEMP/ubuntu-state.raw"
   if [ "$run" = fresh ]; then disk="$RUNNER_TEMP/ubuntu-fresh.raw"; fi
   timeout --foreground 120 pichi run ubuntu:port-check --storage-file "$disk" > "qualification-evidence/$run.log" 2>&1
+  if grep -q 'Neither libbpf' "qualification-evidence/$run.log"; then exit 1; fi
   grep -q 'old root unmounted' "qualification-evidence/$run.log"
   grep -q '^PORT_PASS' "qualification-evidence/$run.log"
   grep -q '^PORT_HOSTNAME=ubuntu-port-check' "qualification-evidence/$run.log"

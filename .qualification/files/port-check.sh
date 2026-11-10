@@ -16,7 +16,8 @@ count=$((count+1))
 printf '%s\n' "$count" > /var/lib/port-check-count
 printf 'PORT_STATE_COUNT=%s\n' "$count"
 test -s /var/lib/dpkg/status
-dpkg-query -W systemd e2fsprogs
+dpkg-query -W systemd e2fsprogs libbpf1
+ldconfig -p | grep -q libbpf.so.1
 printf 'PORT_HOSTNAME='
 cat /proc/sys/kernel/hostname
 printf 'PORT_FAILED_UNITS_BEGIN\n'
