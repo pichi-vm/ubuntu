@@ -48,7 +48,7 @@ stages:
           command: |
             arma build --kernel /boot/vmlinuz \
               --config /boot/config-* --initrd /usr/bin/corium \
-              --module virtio_mmio --module virtio_blk --module virtio_console \
+              --module virtio_blk --module virtio_console \
               --module dm_mod --module dm_zero --module dm_snapshot \
               --module dm_verity --module ext4 \
               --cmdline "bootconfig loglevel=5" --dtb attached /boot.pmi
@@ -60,7 +60,7 @@ image:
     define:
       corium.root: ""
       kernel.ro: [ ]
-      kernel.console: [tty0, hvc0]
+      kernel.console: hvc0
       kernel.SYSTEMD_DEFAULT_MOUNT_RATE_LIMIT_BURST: "40"
       kernel.systemd.unit: multi-user.target
       kernel.systemd.show_status: "false"
