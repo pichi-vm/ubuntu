@@ -48,7 +48,7 @@ stages:
           command: |
             arma build --kernel /boot/vmlinuz \
               --config /boot/config-* --initrd /usr/bin/corium \
-              --module virtio_pci --module virtio_blk --module virtio_console \
+              --module virtio_blk --module virtio_console \
               --module dm_mod --module dm_zero --module dm_snapshot \
               --module dm_verity --module ext4 \
               --cmdline "bootconfig loglevel=5" --dtb attached /boot.pmi
@@ -66,6 +66,5 @@ image:
       kernel.systemd.show_status: "false"
 
 requirements:
-  slot: pci
   cpus: { recommended: 2 }
   memory: { required: 1024, recommended: 2048 }
