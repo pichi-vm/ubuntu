@@ -13,6 +13,7 @@ stages:
       /var/lib/apt/lists: tmpfs
     steps:
       - exec:
+          timeout: 20m
           command: |
             case "$(dpkg --print-architecture)" in
               amd64) mirror=http://archive.ubuntu.com/ubuntu ;;
